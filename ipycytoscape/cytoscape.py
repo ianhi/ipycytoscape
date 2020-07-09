@@ -5,6 +5,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 import copy
+from warnings import warn
 
 from spectate import mvc
 from traitlets import TraitType, TraitError
@@ -275,11 +276,13 @@ class Graph(Widget):
         else: # if the edge is not present in the graph
             self.edges.append(edge)
             if source not in self._adj:
+                warn(f"edge source: {str(source)} was not found in the graph - Creating a node with this ID")
                 node_instance = Node()
                 # setting the id, according to current spec should be only int/str
                 node_instance.data = {'id': source}
                 self.add_node(node_instance)
             if target not in self._adj:
+                warn(f"edge target: {str(target)} was not found in the graph - Creating a node with this ID")
                 node_instance = Node()
                 # setting the id, according to current spec should be only int/str
                 node_instance.data = {'id': target}
@@ -306,14 +309,14 @@ class Graph(Widget):
             else: # if the edge is not present in the graph
                 edge_list.append(edge)
                 if source not in self._adj:
+                    warn(f"edge source: {str(source)} was not found in the graph - Creating a node with this ID")
                     node_instance = Node()
-                    # setting the id, according to current spec should be only int/str
                     node_instance.data = {'id': source}
                     node_list.append(node_instance)
                     self._adj[source] = dict()
                 if target not in self._adj:
+                    warn(f"edge target: {str(target)} was not found in the graph - Creating a node with this ID")
                     node_instance = Node()
-                    # setting the id, according to current spec should be only int/str
                     node_instance.data = {'id': target}
                     node_list.append(node_instance)
                     self._adj[target] = dict()
