@@ -193,7 +193,7 @@ class Graph(Widget):
     nodes = MutableList(Instance(Node)).tag(sync=True, **widget_serialization)
     edges = MutableList(Instance(Edge)).tag(sync=True, **widget_serialization)
     # dictionary for syncing graph structure
-    _adj = MutableDict().tag(sync=True)
+    _adj = MutableDict()
 
     def add_node(self, node):
         """
@@ -372,19 +372,22 @@ class Graph(Widget):
             'directed' to the 'classes' attribute of edge.data for all edges
         """
         node_list = list()
-        for node, data in g.nodes(data=True):
-            node_instance = Node()
-            _set_attributes(node_instance, data)
-            if 'id' not in data:
-                node_instance.data['id'] = node
+        for node, data in g.nodes( data=True):
+            if issubclass(type(node), Node):
+                node_instance = node
+            else:
+                node_instance = Node()
+                _set_attributes(node_instance, data)
+                if 'id' not in data:
+                    node_instance.data['id'] = str(node)
             node_list.append(node_instance)
         self.add_nodes(node_list)
 
         edge_list = list()
         for source, target, data in g.edges(data=True):
             edge_instance = Edge()
-            edge_instance.data['source'] = source
-            edge_instance.data['target'] = target
+            edge_instance.data['source'] = source.data['id'] if issubclass(type(source), Node) else str(source)
+            edge_instance.data['target'] = target.data['id'] if issubclass(type(target), Node) else str(target)
             _set_attributes(edge_instance, data)
 
             if directed and 'directed' not in edge_instance.classes:
